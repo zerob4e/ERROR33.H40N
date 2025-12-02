@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>H40N - Contingency</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --panel:#111;
+    --header:#1a1a1a;
+    --muted:#e5e5e5;
+    --out:#cccccc;
+    --err:#ff4d4d;
+    --ok:#00e676;
+    --accent:#ffe100;
+  }
+
+  html,body{height:100%;margin:0;background:var(--bg);font-family:monospace;color:var(--muted)}
+  .terminal-wrapper{
+    width:92%;
+    max-width:980px;
+    margin:40px auto;
+    background:var(--panel);
+    border-radius:10px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.7);
+    overflow:hidden;
+    border:1px solid #222;
+  }
+
+  .terminal-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    background:var(--header);
+    border-bottom:1px solid #222;
+  }
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.red{background:#ff5f56}
+  .dot.yellow{background:#ffbd2e}
+  .dot.green{background:#27c93f}
+  .terminal-title{flex:1;text-align:center;opacity:0.75;font-size:0.95rem}
+
+  #output{
+    height:68vh;
+    padding:22px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    overflow:auto;
+  }
+
+  .terminal-input-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    background:var(--header);
+    border-top:1px solid #222;
+  }
+
+  #prompt{color:var(--ok);font-weight:700}
+  #input{
+    width:100%;
+    background:transparent;
+    border:0;
+    outline:0;
+    color:var(--muted);
+    font-size:1rem;
+  }
+
+  .line{margin:6px 0;word-break:break-word}
+  .cmd{color:var(--muted)}
+  .out{color:var(--out)}
+  .error{color:var(--err); font-weight:700}
+  .success{color:var(--ok); font-weight:700}
+  .progress{color:var(--accent)}
+
+  /* caret animation for typing */
+  .typing::after{
+    content: "";
+    display:inline-block;
+    width:8px;
+    height:1.2em;
+    margin-left:6px;
+    background:var(--muted);
+    animation:blink 1s steps(2, start) infinite;
+    vertical-align:bottom;
+  }
+  @keyframes blink { 50% { background:transparent } }
+
+  /* small responsiveness */
+  @media (max-width:520px){
+    .terminal-title{font-size:0.8rem}
+    #output{height:60vh;padding:14px}
+  }
+</style>
+</head>
+<body>
+
+<div class="terminal-wrapper" role="application" aria-label="Terminal H40N">
+  <div class="terminal-header">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+    <div class="terminal-title">H40N - CONTINGENCY</div>
+  </div>
+
+  <div id="output" aria-live="polite"></div>
+
+  <div class="terminal-input-area">
+    <div id="prompt">&gt;</div>
+    <input id="input" autocomplete="off" placeholder="" aria-label="Comando" />
+  </div>
+</div>
+
+<script>
+/* ---------- Util: typing line-by-line ---------- */
+const output = document.getElementById('output');
+const input = document.getElementById('input');
+
+function appendLine(cls='out', text=''){
+  const el = document.createElement('div');
+  el.className = 'line ' + cls;
+  el.textContent = text;
+  output.appendChild(el);
+  output.scrollTop = output.scrollHeight;
+  return el;
+}
+
+function typeLine(cls, text, speed=18){
+  return new Promise(resolve=>{
+    const el = appendLine(cls, '');
+    el.classList.add('typing');
+    let i = 0;
+    function step(){
+      if(i <= text.length){
+        el.textContent = text.slice(0,i);
+        output.scrollTop = output.scrollHeight;
+        i++;
+        setTimeout(step, speed);
+      } else {
+        el.classList.remove('typing');
+        resolve(el);
+      }
+    }
+    step();
+  });
+}
+
+/* ---------- Show only the contingency line on boot ---------- */
+const initialLine = '// contingency.run("H40N_PC:PR4G4#33");';
+
+async function bootSequence(){
+  // clear any residual content
+  output.innerHTML = '';
+  // small pause for drama
+  await new Promise(r => setTimeout(r, 300));
+  await typeLine('cmd', initialLine, 22);
+  // keep focus on input
+  input.focus();
+}
+bootSequence();
+
+/* ---------- Behavior: ANY input -> error + system active ---------- */
+
+function handleAnyCommand(raw){
+  // ignore content, always respond with same pattern
+  const trimmed = (raw||'').trim();
+  // echo typed command (optional) - comment out if you DON'T want echo
+  if(trimmed) {
+    appendLine('cmd', '/' + trimmed);
+  }
+
+  // show error then system active (typing)
+  // if there was already an initial line only, we still append messages
+  const seq = async () => {
+    await typeLine('progress', 'Validando input...');
+    await new Promise(r => setTimeout(r, 250)); // tiny pause
+    await typeLine('error', '[ERROR] ERR_HANDLER == ERROR33:A7');
+    await new Promise(r => setTimeout(r, 200));
+    await typeLine('success', 'SISTEMA: ATIVO :: MONITORAMENTO H40N');
+  };
+  seq();
+}
+
+/* Submit on Enter */
+input.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    const val = input.value;
+    input.value = '';
+    handleAnyCommand(val);
+  }
+  // optional: keep input focused
+});
+
+/* Prevent paste/auto-typing from bypassing rules:
+   we still accept typing but always respond with error above. */
+input.addEventListener('paste', (e)=> {
+  e.preventDefault();
+});
+
+/* Accessibility: focus input on click anywhere */
+document.querySelector('.terminal-wrapper').addEventListener('click', ()=> input.focus());
+
+</script>
+</body>
+</html>
