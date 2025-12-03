@@ -75,6 +75,16 @@
         font-size: 1rem;
     }
 
+    .user-msg {
+  color: #6ac8ff; /* azul ciano suave, legível no fundo escuro */
+  }
+
+  .admin-msg {
+  color: #e5e5e5;
+  font-weight: 700;
+  }
+
+
     .line { margin: 5px 0; }
 </style>
 </head>
@@ -135,12 +145,13 @@ function addToHistory(text) {
 const output = document.getElementById("output");
 const input = document.getElementById("input");
 
-function appendLine(text) {
-    const div = document.createElement("div");
-    div.classList.add("line");
-    div.textContent = text;
-    output.appendChild(div);
-    output.scrollTop = output.scrollHeight;
+function appendLine(text, cls = "") {
+  const el = document.createElement("div");
+  el.className = "line " + cls;
+  el.textContent = text;
+  output.appendChild(el);
+  output.scrollTop = output.scrollHeight;
+  return el;
 }
 
 /* ================================
@@ -153,47 +164,38 @@ function loadHistoryIntoOutput() {
 
 function processCommand(cmd) {
 
-    /* ---------------------------
-       COMANDO: deletar linha
-       formato: del N
-    --------------------------- */
+    /* ----- deletar linha ----- */
     if (cmd.startsWith("del ")) {
         let num = parseInt(cmd.replace("del ", "").trim());
-
         if (isNaN(num) || num < 1 || num > history.length) {
             appendLine("[system] linha inválida.");
             return;
         }
-
-        // remover linha N
         let removed = history[num - 1];
         history.splice(num - 1, 1);
         saveHistory();
 
         appendLine(`[system] linha ${num} removida: ${removed}`);
-
-        // atualizar visual
         output.innerHTML = "";
         loadHistoryIntoOutput();
         return;
     }
 
-    /* ---------------------------
-       ADMIN → vira [H40N]
-    --------------------------- */
+    /* ----- admin / H40N ----- */
     if (cmd.startsWith("admin ")) {
         const clean = cmd.replace("admin ", "");
-        appendLine(clean);
-        addToHistory(clean);
+        const text = clean;
+        appendLine(text, "admin-msg");
+        addToHistory(text);
         return;
     }
 
-    /* ---------------------------
-       USUÁRIO NORMAL
-    --------------------------- */
-    appendLine("[user] " + cmd);
-    addToHistory("[user] " + cmd);
+    /* ----- user normal ----- */
+    const text = "[user] " + cmd;
+    appendLine(text, "user-msg");
+    addToHistory(text);
 }
+
 
 
 /* ================================
@@ -239,4 +241,3 @@ input.focus();
 
 </body>
 </html>
-
