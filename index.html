@@ -76,14 +76,13 @@
     }
 
     .user-msg {
-  color: #6ac8ff; /* azul ciano suave, legível no fundo escuro */
-  }
+        color: #6ac8ff;
+    }
 
-  .admin-msg {
-  color: #e5e5e5;
-  font-weight: 700;
-  }
-
+    .admin-msg {
+        color: #e5e5e5;
+        font-weight: 700;
+    }
 
     .line { margin: 5px 0; }
 </style>
@@ -108,141 +107,55 @@
 </div>
 
 <script>
-/* ================================
-      HISTÓRICO (persistente)
-================================ */
-const STORAGE_KEY = "terminal_history";
-let history = [];
-let historyIndex = -1;
+/* ============= TERMINAL SIMPLES (SEM HISTÓRICO) ============= */
 
-function loadHistory() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        try {
-            history = JSON.parse(saved);
-        } catch {
-            history = [];
-        }
-    }
-}
-
-function saveHistory() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-}
-
-function addToHistory(html, cls = "") {
-    history.push({ html, cls });
-
-    if (history.length > 200) {
-        history = history.slice(history.length - 200);
-    }
-
-    saveHistory();
-}
-
-
-/* ================================
-      OUTPUT
-================================ */
 const output = document.getElementById("output");
 const input = document.getElementById("input");
 
+/* Escreve no terminal */
 function appendLine(text, cls = "") {
-  const el = document.createElement("div");
-  el.className = "line " + cls;
-  el.innerHTML = text;
-  output.appendChild(el);
-  output.scrollTop = output.scrollHeight;
-  return el;
+    const el = document.createElement("div");
+    el.className = "line " + cls;
+    el.innerHTML = text;
+    output.appendChild(el);
+    output.scrollTop = output.scrollHeight;
 }
 
-/* ================================
-      STARTUP: mostrar histórico
-================================ */
-function loadHistoryIntoOutput() {
-    history.forEach(entry => {
-        appendLine(entry.html, entry.cls);
-    });
+/* Mensagens iniciais ao abrir */
+function initialMessages() {
+    // 🔥 É AQUI QUE VOCÊ COLOCA O QUE PRECISA APARECER AO ABRIR
+    appendLine("[system] H40N//BOOT_SEQUENCE: OK");
+    appendLine("[system] zona T-Null checksum: stable");
+    appendLine("[system] conexão com ECH0: inativa");
+    appendLine("");
+    appendLine("// contingency.run(\"H40N_PC:PR4G4#33\");");
 }
 
+/* Processa comandos */
 function processCommand(cmd) {
-
-    /* ----- deletar linha ----- */
-    if (cmd.startsWith("del ")) {
-    let num = parseInt(cmd.replace("del ", "").trim());
-    if (isNaN(num) || num < 1 || num > history.length) {
-        appendLine("[system] linha inválida.");
-        return;
-    }
-
-    history.splice(num - 1, 1);
-    saveHistory();
-
-    appendLine(`[system] linha ${num} removida.`);
-
-    output.innerHTML = "";
-    loadHistoryIntoOutput();
-    return;
-    }
-
-
-    /* ----- admin / H40N ----- */
     if (cmd.startsWith("admin ")) {
         const clean = cmd.replace("admin ", "");
-        const text = clean;
-
-        const el = appendLine(text, "admin-msg");
-        addToHistory(el.outerHTML, "admin-msg");
-
+        appendLine(clean, "admin-msg");
         return;
     }
 
-    /* ----- user normal ----- */
-    const text = "[user] " + cmd;
-
-    const el = appendLine(text, "user-msg");
-    addToHistory(el.outerHTML, "user-msg");
+    appendLine("[user] " + cmd, "user-msg");
 }
 
-
-/* ================================
-      NAVEGAÇÃO COM SETAS
-================================ */
+/* Input handler */
 input.addEventListener("keydown", (e) => {
-    // ENTER
     if (e.key === "Enter") {
         const cmd = input.value.trim();
+        if (!cmd) return;
+
+        processCommand(cmd);
+
         input.value = "";
-        historyIndex = -1;
-
-        if (cmd) processCommand(cmd);
-    }
-
-    // SETA PARA CIMA
-    if (e.key === "ArrowUp") {
-        if (history.length > 0) {
-            if (historyIndex < history.length - 1) historyIndex++;
-            input.value = history[history.length - 1 - historyIndex] || "";
-        }
-    }
-
-    // SETA PARA BAIXO
-    if (e.key === "ArrowDown") {
-        if (historyIndex > 0) {
-            historyIndex--;
-            input.value = history[history.length - 1 - historyIndex] || "";
-        } else {
-            historyIndex = -1;
-            input.value = "";
-        }
     }
 });
 
-/* ================================
-      INIT
-================================ */
-loadHistory();
-loadHistoryIntoOutput();
+/* Start */
+initialMessages();
 input.focus();
 </script>
 
