@@ -148,19 +148,24 @@ function typeLine(cls, text, speed=18){
   });
 }
 
-/* ---------- Show only the contingency line on boot ---------- */
-const initialLine = '// contingency.run("H40N_PC:PR4G4#33");';
-
+/* ---------- Show the 3 boot lines on start ---------- */
 async function bootSequence(){
-  // clear any residual content
   output.innerHTML = '';
-  // small pause for drama
-  await new Promise(r => setTimeout(r, 300));
-  await typeLine('cmd', initialLine, 22);
-  // keep focus on input
+
+  await new Promise(r => setTimeout(r, 250));
+
+  await typeLine('cmd', 'trace = detectado', 22);
+  await new Promise(r => setTimeout(r, 180));
+
+  await typeLine('cmd', 'access_cmd = status operador', 22);
+  await new Promise(r => setTimeout(r, 160));
+
+  await typeLine('cmd', 'nota: operador preso em vazio responsivo — identidade operacional fragmentada.', 22);
+
   input.focus();
 }
 bootSequence();
+
 
 /* ---------- Behavior: ANY input -> error + system active ---------- */
 
