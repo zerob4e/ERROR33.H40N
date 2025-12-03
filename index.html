@@ -81,6 +81,7 @@
 
   .admin-msg {
   color: #e5e5e5;
+  font-weight: 700;
   }
 
 
@@ -129,14 +130,16 @@ function saveHistory() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 }
 
-function addToHistory(text) {
-    if (!text.trim()) return;
-    history.push(text);
+function addToHistory(html, cls = "") {
+    history.push({ html, cls });
+
     if (history.length > 200) {
         history = history.slice(history.length - 200);
     }
+
     saveHistory();
 }
+
 
 /* ================================
       OUTPUT
@@ -147,7 +150,7 @@ const input = document.getElementById("input");
 function appendLine(text, cls = "") {
   const el = document.createElement("div");
   el.className = "line " + cls;
-  el.textContent = text;
+  el.innerHTML = text;
   output.appendChild(el);
   output.scrollTop = output.scrollHeight;
   return el;
@@ -157,44 +160,49 @@ function appendLine(text, cls = "") {
       STARTUP: mostrar histórico
 ================================ */
 function loadHistoryIntoOutput() {
-    if (history.length === 0) return;
-    history.forEach(line => appendLine(line));
+    history.forEach(entry => {
+        appendLine(entry.html, entry.cls);
+    });
 }
 
 function processCommand(cmd) {
 
     /* ----- deletar linha ----- */
     if (cmd.startsWith("del ")) {
-        let num = parseInt(cmd.replace("del ", "").trim());
-        if (isNaN(num) || num < 1 || num > history.length) {
-            appendLine("[system] linha inválida.");
-            return;
-        }
-        let removed = history[num - 1];
-        history.splice(num - 1, 1);
-        saveHistory();
-
-        appendLine(`[system] linha ${num} removida: ${removed}`);
-        output.innerHTML = "";
-        loadHistoryIntoOutput();
+    let num = parseInt(cmd.replace("del ", "").trim());
+    if (isNaN(num) || num < 1 || num > history.length) {
+        appendLine("[system] linha inválida.");
         return;
     }
+
+    history.splice(num - 1, 1);
+    saveHistory();
+
+    appendLine(`[system] linha ${num} removida.`);
+
+    output.innerHTML = "";
+    loadHistoryIntoOutput();
+    return;
+    }
+
 
     /* ----- admin / H40N ----- */
     if (cmd.startsWith("admin ")) {
         const clean = cmd.replace("admin ", "");
         const text = clean;
-        appendLine(text, "admin-msg");
-        addToHistory(text);
+
+        const el = appendLine(text, "admin-msg");
+        addToHistory(el.outerHTML, "admin-msg");
+
         return;
     }
 
     /* ----- user normal ----- */
     const text = "[user] " + cmd;
-    appendLine(text, "user-msg");
-    addToHistory(text);
-}
 
+    const el = appendLine(text, "user-msg");
+    addToHistory(el.outerHTML, "user-msg");
+}
 
 
 /* ================================
@@ -240,4 +248,3 @@ input.focus();
 
 </body>
 </html>
-
