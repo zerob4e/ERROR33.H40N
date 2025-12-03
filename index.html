@@ -183,8 +183,8 @@ function processCommand(cmd) {
     --------------------------- */
     if (cmd.startsWith("admin ")) {
         const clean = cmd.replace("admin ", "");
-        appendLine("[H40N] " + clean);
-        addToHistory("[H40N] " + clean);
+        appendLine(clean);
+        addToHistory(clean);
         return;
     }
 
