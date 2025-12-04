@@ -6,88 +6,89 @@
 <title>H40N - N.ROOT | CONTINGENCY</title>
 
 <style>
-    body {
-        background: #0a0a0a;
-        margin: 0;
-        padding: 0;
-        font-family: monospace;
-        color: #e5e5e5;
-    }
+body {
+    background: #0a0a0a;
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    color: #e5e5e5;
+}
+.terminal-wrapper {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #222;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+}
+.terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #1a1a1a;
+    border-bottom: 1px solid #222;
+}
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+.terminal-title {
+    flex: 1;
+    text-align: center;
+    opacity: 0.75;
+}
+#line-container { 
+    height: 65vh; 
+    padding: 20px; 
+    overflow-y: auto; 
+    white-space: pre-wrap; 
+}
+.terminal-input-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #1a1a1a;
+    border-top: 1px solid #222;
+}
+#prompt { color: #00e676; font-weight: bold; }
+#input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e5e5e5;
+    font-size: 1rem;
+}
+.user-msg { color: #6ac8ff; }
+.admin-msg { color: #e5e5e5; }
+.note { color: #888; font-style: italic; }
+.echo-msg { color: #ff6f91; }
+.line { margin: 5px 0; }
 
-    .terminal-wrapper {
-        width: 90%;
-        max-width: 900px;
-        margin: 40px auto;
-        background: #111;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #222;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    }
+/* ⭐ ajuste para nota interna do Noah */
+#noahWarning {
+    display: none;
+    opacity: 0;
+    color: #888;
+    font-style: italic;
+    margin-left: 20px;
+    transition: opacity 0.3s;
+}
 
-    .terminal-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        background: #1a1a1a;
-        border-bottom: 1px solid #222;
-    }
-
-    .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-    .red { background: #ff5f56; }
-    .yellow { background: #ffbd2e; }
-    .green { background: #27c93f; }
-
-    .terminal-title {
-        flex: 1;
-        text-align: center;
-        opacity: 0.75;
-    }
-
-    #output {
-        height: 65vh;
-        padding: 20px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-    }
-
-    .terminal-input-area {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        background: #1a1a1a;
-        border-top: 1px solid #222;
-    }
-
-    #prompt { color: #00e676; font-weight: bold; }
-    #input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #e5e5e5;
-        font-size: 1rem;
-    }
-
-    .user-msg {
-        color: #6ac8ff;
-    }
-
-    .admin-msg {
-        color: #e5e5e5;
-        font-weight: 700;
-    }
-
-    .line { margin: 5px 0; }
+/* ⭐ animação de piscar */
+.blink {
+    animation: blinkNote 0.7s infinite alternate;
+}
+@keyframes blinkNote {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 </style>
 </head>
-
 <body>
 
 <div class="terminal-wrapper">
@@ -98,7 +99,12 @@
         <div class="terminal-title">H40N - N.ROOT | CONTINGENCY</div>
     </div>
 
-    <div id="output"></div>
+    <div id="line-container"></div>
+
+    <!-- ⭐ AGORA A NOTA ESTÁ DENTRO DO TERMINAL -->
+    <div id="noahWarning">
+        o sistema foi afetado pelo ECH0 :: cuidado...
+    </div>
 
     <div class="terminal-input-area">
         <div id="prompt">&gt;</div>
@@ -107,60 +113,196 @@
 </div>
 
 <script>
-/* ============= TERMINAL SIMPLES (SEM HISTÓRICO) ============= */
+let echoActive = false;
+let notesStopped = false;
+let noteTimeout = null;
 
-const output = document.getElementById("output");
+const output = document.getElementById("line-container");
 const input = document.getElementById("input");
 
-/* Escreve no terminal */
-function appendLine(text, cls = "") {
+/* ============================
+   Histórico inicial
+============================ */
+const terminalHistory = [
+    { text: "// contingency.run(\"H40N_PC:PR4G4#33\");", cls: "admin-msg" },
+    { text: "[user] TKT?DOKO?", cls: "user-msg" },
+    { text: "trace = detectado", cls: "admin-msg" },
+    { text: "access_cmd = status operador", cls: "admin-msg" },
+    { text: "[user] Cidade dos Anjos ou El Dorado? Quem é ECH0?", cls: "user-msg" },
+    { text: "required_action: executar `status operador`", cls: "admin-msg" },
+];
+
+/* ============================
+   Notas do Noah
+============================ */
+const noahNotes = [
+    "alguém... por favor... n- me deixe aqui...",
+    "isso tudo é culpa minha... devia ter para-",
+    "não consigo mais distinguir o tempo...",
+    "estou preso... sozinho-",
+    "cada seg- aqui é um pedaço de mim que desaparece-",
+    "o terminal está me consumindo...",
+    "eu sinto que estou desaparecen-",
+    "praga— por favor... me encontre...",
+];
+
+/* ============================
+   Tipo e apaga
+============================ */
+function typeAndDelete(text, cls = "note", speed = 38) {
+    return new Promise(resolve => {
+        if (notesStopped) return resolve();
+
+        const line = document.createElement("div");
+        line.className = "line " + cls;
+        output.appendChild(line);
+
+        let i = 0;
+        let deleting = false;
+
+        function step() {
+            if (notesStopped) {
+                line.remove();
+                return resolve();
+            }
+
+            if (!deleting) {
+                line.textContent = text.substring(0, i);
+                i++;
+                if (i > text.length) {
+                    deleting = true;
+                    setTimeout(step, 1200);
+                    return;
+                }
+            } else {
+                i--;
+                line.textContent = text.substring(0, i);
+                if (i < 0) {
+                    line.remove();
+                    return resolve();
+                }
+            }
+
+            setTimeout(step, deleting ? speed / 2 : speed);
+        }
+
+        step();
+    });
+}
+
+/* ============================
+   Loop de notas
+============================ */
+async function startNotesLoop() {
+    if (notesStopped) return;
+
+    const note = noahNotes[Math.floor(Math.random() * noahNotes.length)];
+
+    await typeAndDelete(note);
+
+    if (notesStopped) return;
+
+    noteTimeout = setTimeout(startNotesLoop, 3000 + Math.random() * 5000);
+}
+
+/* ============================
+   Histórico
+============================ */
+function printHistory() {
+    terminalHistory.forEach(entry => {
+        const el = document.createElement("div");
+        el.className = "line " + entry.cls;
+        el.textContent = entry.text;
+        output.appendChild(el);
+    });
+}
+
+/* ⭐ mostra a nota piscando */
+function startNoahWarning() {
+    const warn = document.getElementById("noahWarning");
+    setTimeout(() => {
+        warn.style.display = "block";
+        warn.classList.add("blink");
+        warn.style.opacity = 1;
+    }, 4000);
+}
+
+/* ============================
+   ECH0
+============================ */
+function activateEcho() {
+    if (echoActive) return;
+    echoActive = true;
+
+    notesStopped = true;
+    if (noteTimeout) clearTimeout(noteTimeout);
+
+    typeAndDelete("não fale com ele— por favor— ele me vê—", "note", 38);
+
+    setTimeout(() => {
+        typeWriter("[ECHO] olá intruso", "echo-msg", () => {
+            typeWriter("[ECHO] achou mesmo que eu não iria descobrir?", "echo-msg");
+        });
+    }, 500);
+
+    // ⭐ agora aparece dentro do terminal
+    startNoahWarning();
+}
+
+/* ============================
+   Typewriter
+============================ */
+function typeWriter(text, cls, callback) {
     const el = document.createElement("div");
     el.className = "line " + cls;
-    el.innerHTML = text;
     output.appendChild(el);
-    output.scrollTop = output.scrollHeight;
-}
 
-/* Mensagens iniciais ao abrir */
-function initialMessages() {
-    // 🔥 É AQUI QUE VOCÊ COLOCA O QUE PRECISA APARECER AO ABRIR
-    appendLine("// contingency.run(\"H40N_PC:PR4G4#33\");");
-    appendLine("<span style='color:#4ecbff'>[user] TKT?DOKO?</span>");
-    appendLine("trace = detectado");
-    appendLine("access_cmd = status operador");
-    appendLine("nota: operador preso em vazio responsivo — identidade operacional fragmentada.");
-    appendLine("<span style='color:#4ecbff'>[user] Cidade dos Anjos ou El Dorado? Quem é ECH0?</span>");
-    appendLine("required_action: executar `status operador`");
-}
-
-/* Processa comandos */
-function processCommand(cmd) {
-    if (cmd.startsWith("admin ")) {
-        const clean = cmd.replace("admin ", "");
-        appendLine(clean, "admin-msg");
-        return;
+    let i = 0;
+    function write() {
+        el.textContent = text.substring(0, i);
+        i++;
+        if (i <= text.length) {
+            setTimeout(write, 35);
+        } else if (callback) {
+            callback();
+        }
     }
-
-    appendLine("[user] " + cmd, "user-msg");
+    write();
 }
 
-/* Input handler */
-input.addEventListener("keydown", (e) => {
+/* ============================
+   Input
+============================ */
+input.addEventListener("keydown", e => {
     if (e.key === "Enter") {
+
         const cmd = input.value.trim();
-        if (!cmd) return;
-
-        processCommand(cmd);
-
         input.value = "";
+
+        const userLine = document.createElement("div");
+        userLine.className = "line user-msg";
+        userLine.textContent = `[user] ${cmd}`;
+        output.appendChild(userLine);
+
+        if (!echoActive) {
+            activateEcho();
+            return;
+        }
+
+        typeWriter("[ECHO] Ele está se perdendo - TIC-TAC", "echo-msg");
     }
 });
 
-/* Start */
-initialMessages();
+/* ============================
+   Início
+============================ */
+printHistory();
+
+setTimeout(() => {
+    if (!notesStopped) startNotesLoop();
+}, 2000);
+
 input.focus();
 </script>
-
 </body>
 </html>
-
