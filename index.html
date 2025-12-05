@@ -1,97 +1,114 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>H40N - N.ROOT | CONTINGENCY</title>
-
 <style>
-body {
-    background: #0a0a0a;
-    margin: 0;
-    padding: 0;
-    font-family: monospace;
-    color: #e5e5e5;
-}
-.terminal-wrapper {
-    width: 90%;
-    max-width: 900px;
-    margin: 40px auto;
-    background: #111;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid #222;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-}
-.terminal-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: #1a1a1a;
-    border-bottom: 1px solid #222;
-}
-.dot { width: 12px; height: 12px; border-radius: 50%; }
-.red { background: #ff5f56; }
-.yellow { background: #ffbd2e; }
-.green { background: #27c93f; }
-.terminal-title {
-    flex: 1;
-    text-align: center;
-    opacity: 0.75;
-}
-#line-container { 
-    height: 65vh; 
-    padding: 20px; 
-    overflow-y: auto; 
-    white-space: pre-wrap; 
-}
-.terminal-input-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: #1a1a1a;
-    border-top: 1px solid #222;
-}
-#prompt { color: #00e676; font-weight: bold; }
-#input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #e5e5e5;
-    font-size: 1rem;
-}
-.user-msg { color: #6ac8ff; }
-.admin-msg { color: #e5e5e5; }
-.note { color: #888; font-style: italic; }
-.echo-msg { color: #ff6f91; }
-.line { margin: 5px 0; }
+    :root{
+        --bg:#0a0a0a;
+        --panel:#111;
+        --panel-2:#1a1a1a;
+        --text:#e5e5e5;
+        --muted:#9aa4ac;
+        --accent:#4ecbff;
+        --prompt:#00e676;
+        --user:#6ac8ff;
+        --admin:#e5e5e5;
+    }
+    html,body{
+        height:100%;
+        margin:0;
+        background:var(--bg);
+        font-family:monospace;
+        color:var(--text);
+    }
+    .terminal-wrapper{
+        width:92%;
+        max-width:980px;
+        margin:28px auto;
+        border-radius:10px;
+        overflow:hidden;
+        border:1px solid #222;
+        box-shadow:0 10px 50px rgba(0,0,0,0.7);
+        background:linear-gradient(180deg,var(--panel),#0f0f0f);
+    }
+    .terminal-header{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:12px;
+        background:var(--panel-2);
+        border-bottom:1px solid #222
+    }
+    .dot{
+        width:12px;
+        height:12px;
+        border-radius:50%
+    }
+    .red{background:#ff5f56}
+    .yellow{background:#ffbd2e}
+    .green{background:#27c93f}
+    
+    .terminal-title{
+        flex:1;
+        text-align:center;
+        opacity:.85;
+        font-size:0.95rem
+    }
+    #output{
+        height:68vh;
+        padding:20px;
+        overflow-y:auto;
+        white-space:pre-wrap;
+        line-height:1.35;
+        font-size:0.98rem
+    }
+    .terminal-input-area{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:12px;
+        background:var(--panel-2);
+        border-top:1px solid #222
+    }
+    #prompt{color:var(--prompt);font-weight:700}
+    /* fake input box (disabled) */
+    .input-disabled{
+        flex:1;padding:10px 12px;border-radius:6px;border:1px dashed #2b2b2b;background:transparent;color:var(--muted);
+        font-family:monospace;font-size:0.95rem;
+    }
+    .note-strong{color:#ff9aa2;font-weight:700}
+    .line{margin:6px 0}
+    .meta{color:var(--muted)}
+    .user-msg{color:var(--user)}
+    .admin-msg{color:var(--admin);font-weight:700}
+    .process{color:#ffdb25}
+    .sucess{color:#00e676}
 
-/* ⭐ ajuste para nota interna do Noah */
-#noahWarning {
-    display: none;
-    opacity: 0;
-    color: #888;
-    font-style: italic;
-    margin-left: 20px;
-    transition: opacity 0.3s;
-}
+    /* typing caret for lines being typed */
+    .typing-caret::after{
+        content: "|";
+        display:inline-block;
+        margin-left:6px;
+        animation: blink 1s steps(2,start) infinite;
+        color:var(--text);
+    }
+    @keyframes blink{50%{opacity:0}}
+    /* small emphasis */
+    .em{color:var(--accent)}
+    /* scrollbar cosmetic */
+    #output::-webkit-scrollbar{width:10px}
+    #output::-webkit-scrollbar-thumb{background:#111;border-radius:6px}
 
-/* ⭐ animação de piscar */
-.blink {
-    animation: blinkNote 0.7s infinite alternate;
-}
-@keyframes blinkNote {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+    .gap {
+    height: 22px;     /* tamanho visual do salto */
+    display: block;
+    }
 </style>
 </head>
 <body>
-
-<div class="terminal-wrapper">
+<div class="terminal-wrapper" role="region" aria-label="Contingency Terminal">
     <div class="terminal-header">
         <div class="dot red"></div>
         <div class="dot yellow"></div>
@@ -99,211 +116,165 @@ body {
         <div class="terminal-title">H40N - N.ROOT | CONTINGENCY</div>
     </div>
 
-    <div id="line-container"></div>
+    <div id="output" aria-live="polite"></div>
 
-    <!-- ⭐ AGORA A NOTA ESTÁ DENTRO DO TERMINAL -->
-    <div id="noahWarning">
-        o sistema foi afetado pelo ECH0 :: cuidado...
-    </div>
-
-    <div class="terminal-input-area">
+    <div class="terminal-input-area" aria-hidden="true">
         <div id="prompt">&gt;</div>
-        <input id="input" autocomplete="off">
+        <!-- área onde usuário podia digitar: permissão removida -->
+        <div class="input-disabled" title="Escrita desativada">
+            &nbsp;Aguarde o sistema restaurar. Não é possível inserir comandos agora.
+        </div>
     </div>
 </div>
 
 <script>
-let echoActive = false;
-let notesStopped = false;
-let noteTimeout = null;
+/* TIPO DE MÁQUINA: animação de digitação por linha (velocidade variável)
+   Mantivemos o layout e estética do anexo (header, cores, fonte monospace)
+   e adicionamos a animação de digitação que exibe o diálogo solicitado. */
 
-const output = document.getElementById("line-container");
-const input = document.getElementById("input");
+const output = document.getElementById('output');
 
-/* ============================
-   Histórico inicial
-============================ */
-const terminalHistory = [
-    { text: "// contingency.run(\"H40N_PC:PR4G4#33\");", cls: "admin-msg" },
-    { text: "[user] TKT?DOKO?", cls: "user-msg" },
-    { text: "trace = detectado", cls: "admin-msg" },
-    { text: "access_cmd = status operador", cls: "admin-msg" },
-    { text: "[user] Cidade dos Anjos ou El Dorado? Quem é ECH0?", cls: "user-msg" },
-    { text: "required_action: executar `status operador`", cls: "admin-msg" },
+/* --- Diálogo (cada item é um objeto: texto e opcional classe) --- */
+const lines = [
+  {text: "[04.12.2025 - 03:33:03]", cls: "meta"},
+  { text: "", cls: "" },
+  {text: "H40N.inject(): system/core/reset - force"},
+  {text: "Iniciando reinicialização do contingency", cls: "process"},
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  {text: "CONTINGENCY.TERMINAL - RECOVERY MODE [03%]"},
+  {text: "[H40N] ok… só mais alguns blocos", cls: "user-msg"},
+  { text: "", cls: "" },
+  {text: "ECH0.signing in", cls: "sucess"},
+  {text: "[H40N] anda, anda… antes que ele entenda o que estou tentando fazer", cls: "user-msg"},
+  {text: "[ECH0] impossível acelerar. “paciência” não é um parâmetro interno", cls: "em"},
+  {text: "[H40N] então inventa um", cls: "user-msg"},
+  { text: "", cls: "gap" },
+  { text: "", cls: "gap" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  {text: "[H40N] eu vou morrer aqui", cls: "user-msg"},
+  {text: "DEAD.NOTPERMISSION", cls: "admin-msg"},
+    { text: "", cls: "" },
+  {text: "CONTINGENCY.TERMINAL - RECOVERY MODE [63%]"},
+  { text: "", cls: "gap" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  { text: "", cls: "" },
+  {text: "ECH0.inject(): play/rap-hashirama.mp3"},
+  {text: "reproduzindo: “Rap do Hashirama – 7 Minutoz”", cls: "sucess"},
+  {text: "classificação interna: “música de batalhar contra o desespero”.", cls: "meta"},
+  {text: "", cls: ""},
+  {text: "[H40N] isso foi ofensivo", cls: "user-msg"},
+  {text: "[ECH0] você quem marcou como favorita algumas vezes", cls: "em"},
+  {text: "", cls: ""},
+  { text: "", cls: "gap" },
+  {text: "CONTINGENCY.TERMINAL - RECOVERY MODE [83%]"},
+  {text: "ECH0.inject(): system/core/reset/rtemp :: 40%", cls: "admin-msg"},
+  {text: "Processo de reinicialização alterado", cls: "process"},
+  {text: "CONTINGENCY.TERMINAL - RECOVERY MODE [43%]"},
+  {text: "", cls: ""},
+  {text: "[H40N] você voltou o relógio?", cls: "user-msg"},
+  {text: "[ECH0] não, não. O tempo que voltou foi o seu", cls: "em"},
+  {text: "[ECH0] por favor, continue ouvindo seu… rap motivacional de ninja", cls: "em"},
+  {text: "", cls: ""},
+  { text: "", cls: "gap" },
+  { text: "", cls: "gap" },
+  { text: "", cls: "gap" },
+  {text: "ECH0.signing out"},
+  {text: "", cls: ""},
 ];
 
-/* ============================
-   Notas do Noah
-============================ */
-const noahNotes = [
-    "alguém... por favor... n- me deixe aqui...",
-    "isso tudo é culpa minha... devia ter para-",
-    "não consigo mais distinguir o tempo...",
-    "estou preso... sozinho-",
-    "cada seg- aqui é um pedaço de mim que desaparece-",
-    "o terminal está me consumindo...",
-    "eu sinto que estou desaparecen-",
-    "praga— por favor... me encontre...",
-];
+/* --- Configurações de digitação --- */
+const baseSpeed = 18; // ms por caractere (padrão)
+const variance = 40;  // variação aleatória para humanizar
+const linePause = 420; // pausa entre linhas quando completas
+const shortPause = 220; // pausa curta para quebras
 
-/* ============================
-   Tipo e apaga
-============================ */
-function typeAndDelete(text, cls = "note", speed = 38) {
-    return new Promise(resolve => {
-        if (notesStopped) return resolve();
-
-        const line = document.createElement("div");
-        line.className = "line " + cls;
-        output.appendChild(line);
-
-        let i = 0;
-        let deleting = false;
-
-        function step() {
-            if (notesStopped) {
-                line.remove();
-                return resolve();
-            }
-
-            if (!deleting) {
-                line.textContent = text.substring(0, i);
-                i++;
-                if (i > text.length) {
-                    deleting = true;
-                    setTimeout(step, 1200);
-                    return;
-                }
-            } else {
-                i--;
-                line.textContent = text.substring(0, i);
-                if (i < 0) {
-                    line.remove();
-                    return resolve();
-                }
-            }
-
-            setTimeout(step, deleting ? speed / 2 : speed);
-        }
-
-        step();
-    });
-}
-
-/* ============================
-   Loop de notas
-============================ */
-async function startNotesLoop() {
-    if (notesStopped) return;
-
-    const note = noahNotes[Math.floor(Math.random() * noahNotes.length)];
-
-    await typeAndDelete(note);
-
-    if (notesStopped) return;
-
-    noteTimeout = setTimeout(startNotesLoop, 3000 + Math.random() * 5000);
-}
-
-/* ============================
-   Histórico
-============================ */
-function printHistory() {
-    terminalHistory.forEach(entry => {
-        const el = document.createElement("div");
-        el.className = "line " + entry.cls;
-        el.textContent = entry.text;
-        output.appendChild(el);
-    });
-}
-
-/* ⭐ mostra a nota piscando */
-function startNoahWarning() {
-    const warn = document.getElementById("noahWarning");
-    setTimeout(() => {
-        warn.style.display = "block";
-        warn.classList.add("blink");
-        warn.style.opacity = 1;
-    }, 4000);
-}
-
-/* ============================
-   ECH0
-============================ */
-function activateEcho() {
-    if (echoActive) return;
-    echoActive = true;
-
-    notesStopped = true;
-    if (noteTimeout) clearTimeout(noteTimeout);
-
-    typeAndDelete("não fale com ele— por favor— ele me vê—", "note", 38);
-
-    setTimeout(() => {
-        typeWriter("[ECHO] olá intruso", "echo-msg", () => {
-            typeWriter("[ECHO] achou mesmo que eu não iria descobrir?", "echo-msg");
-        });
-    }, 500);
-
-    // ⭐ agora aparece dentro do terminal
-    startNoahWarning();
-}
-
-/* ============================
-   Typewriter
-============================ */
-function typeWriter(text, cls, callback) {
-    const el = document.createElement("div");
-    el.className = "line " + cls;
+/* Append line element empty (so we can type into it) */
+function createLineElement(cls){
+    const el = document.createElement('div');
+    el.className = 'line ' + (cls || '');
     output.appendChild(el);
-
-    let i = 0;
-    function write() {
-        el.textContent = text.substring(0, i);
-        i++;
-        if (i <= text.length) {
-            setTimeout(write, 35);
-        } else if (callback) {
-            callback();
-        }
-    }
-    write();
+    output.scrollTop = output.scrollHeight;
+    return el;
 }
 
-/* ============================
-   Input
-============================ */
-input.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-
-        const cmd = input.value.trim();
-        input.value = "";
-
-        const userLine = document.createElement("div");
-        userLine.className = "line user-msg";
-        userLine.textContent = `[user] ${cmd}`;
-        output.appendChild(userLine);
-
-        if (!echoActive) {
-            activateEcho();
-            return;
+/* Type a single line with per-character delay */
+function typeLine(targetEl, text, onDone){
+    // show as typing (caret) while typing
+    targetEl.classList.add('typing-caret');
+    let i = 0;
+    function step(){
+        // small randomized speed to feel human
+        const char = text.charAt(i);
+        targetEl.innerHTML += char === "<" ? "&lt;" : (char === ">" ? "&gt;" : char);
+        i++;
+        output.scrollTop = output.scrollHeight;
+        if(i < text.length){
+            const delay = baseSpeed + Math.random()*variance;
+            setTimeout(step, delay);
+        } else {
+            // finish
+            targetEl.classList.remove('typing-caret');
+            if (typeof onDone === 'function') onDone();
         }
-
-        typeWriter("[ECHO] Intrusos não são bem-vindos", "echo-msg");
     }
+    // handle empty lines quickly
+    if(text.length === 0){
+        targetEl.innerHTML = "";
+        targetEl.classList.remove('typing-caret');
+        if (typeof onDone === 'function') onDone();
+        return;
+    }
+    // initial small pause before typing each line
+    setTimeout(step, 60 + Math.random()*140);
+}
+
+/* Orquestra a sequência de linhas (tipo um "player") */
+function playLines(idx=0){
+    if(idx >= lines.length) return;
+    const item = lines[idx];
+    const el = createLineElement(item.cls);
+    // special: if the line looks like progress e.g. "[... %]" we simulate faster typing
+    let speedBoost = 0;
+    if(/\[\d{2}%\]|\:\:\s*\d+%/.test(item.text)) speedBoost = -8;
+
+    // override baseSpeed temporarily? we'll pass through typeLine using current variables
+    typeLine(el, item.text, ()=>{
+        // small pause after certain lines
+        const pause = item.text.trim().length === 0 ? shortPause : linePause + Math.random()*200 + speedBoost;
+        setTimeout(()=> playLines(idx+1), pause);
+    });
+}
+
+/* Start the animation */
+setTimeout(()=> {
+    playLines(0);
+}, 450);
+
+/* allow user to click output to fast-forward: clicking will print remaining lines instantly */
+let fastMode = false;
+output.addEventListener('click', () => {
+    if(fastMode) return;
+    fastMode = true;
+    // clear output and print all remaining lines immediately (no typing)
+    output.innerHTML = '';
+    for(const item of lines){
+        const el = document.createElement('div');
+        el.className = 'line ' + (item.cls || '');
+        // escape angle brackets just in case
+        el.textContent = item.text;
+        output.appendChild(el);
+    }
+    output.scrollTop = output.scrollHeight;
 });
 
-/* ============================
-   Início
-============================ */
-printHistory();
-
-setTimeout(() => {
-    if (!notesStopped) startNotesLoop();
-}, 2000);
-
-input.focus();
+/* Accessibility: focusable region for screen readers */
+output.tabIndex = 0;
 </script>
 </body>
 </html>
-
