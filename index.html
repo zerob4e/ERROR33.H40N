@@ -88,7 +88,7 @@
     .line{margin:6px 0}
     .meta{color:var(--muted)}
     .user-NOAH{color:#3ee9e9}
-    .user-ECH0{color:#ffa200}
+    .user-ECH0{color:#17acec}
     .admin-msg{color:var(--admin)}
     .process{color:#ffdb25}
     .sucess{color:#00e676}
@@ -167,6 +167,8 @@
     transition: opacity 0.45s ease;
     }
 
+
+
 </style>
 </head>
 <body>
@@ -192,141 +194,6 @@
 <script>
 const output = document.getElementById('output');
 
-let progressBarFixed = null;
-let hasShownFirstBar = false;
-
-// ----- FUNÇÃO: cria barra fixa ou atualiza -----
-// -----------------------------
-// SISTEMA DE PROGRESSO AUTOMÁTICO
-// -----------------------------
-let progressValue = 0;  // valor inicial da barra
-let autoProgressInterval = null;
-
-// cria/atualiza a barra fixa
-function updateFixedProgress(val) {
-    progressValue = Math.max(0, Math.min(val, 99)); // nunca chega a 100
-
-    if (!progressBarFixed) {
-        progressBarFixed = document.createElement("div");
-        progressBarFixed.className = "progress-bar-container";
-
-        const bar = document.createElement("div");
-        bar.className = "progress-bar";
-        bar.style.width = progressValue + "%";
-
-        const label = document.createElement("div");
-        label.className = "progress-label";
-        label.textContent = `Restaurando sistema... ${progressValue}%`;
-
-        progressBarFixed.appendChild(bar);
-        progressBarFixed.appendChild(label);
-        output.appendChild(progressBarFixed);
-    } else {
-        const bar = progressBarFixed.querySelector(".progress-bar");
-        const label = progressBarFixed.querySelector(".progress-label");
-
-        bar.style.width = progressValue + "%";
-        label.textContent = `Restaurando sistema... ${progressValue}%`;
-    }
-}
-
-// inicia subida automática de 1% a cada 10s
-function startAutoProgress() {
-    if (autoProgressInterval) return; 
-
-    autoProgressInterval = setInterval(() => {
-        if (progressValue < 99) {
-    updateFixedProgress(progressValue + 1);
-    } else {
-    triggerECH0Reset(); // chama a quebra do ECH0
-    }
-
-    }, 2000);
-}
-
-// reduz porcentagem quando ECH0.inject aparece
-function applyECH0Injection(amount) {
-    updateFixedProgress(progressValue - amount);
-}
-
-// chama depois de criar a barra inicial
-startAutoProgress();
-
-
-// ----- FUNÇÃO: remove linhas ENTRE o índice 8 até antes da barra -----
-// (mantive essa função, não usada se você prefere backspace; deixei por segurança)
-function removeInitialLines() {
-    const children = Array.from(output.children);
-
-    // Mantém tudo até a barra fixa
-    const preserveUntil = children.indexOf(progressBarFixed);
-
-    for (let i = preserveUntil - 1; i >= 2; i--) {
-        output.removeChild(children[i]);
-    }
-}
-
-// ----- FUNÇÃO: apaga bloco com animação de backspace -----
-async function eraseBlock(lines) {
-    for (let i = lines.length - 1; i >= 0; i--) {
-        const el = lines[i];
-
-        // aplica fade-out
-        el.classList.add("fade-out");
-
-        // espera a transição terminar
-        await new Promise(resolve => setTimeout(resolve, 460));
-
-        if (el.parentElement) {
-            el.parentElement.removeChild(el);
-        }
-    }
-}
-
-// ============================
-//   FUNÇÃO: RESET DO ECH0
-// ============================
-async function triggerECH0Reset() {
-
-    // impede progressão automática enquanto ECH0 fala
-    clearInterval(autoProgressInterval);
-    autoProgressInterval = null;
-
-    // limpa qualquer bloco que ainda esteja na tela (mantém só a barra)
-    while (output.lastChild && output.lastChild !== progressBarFixed) {
-        output.removeChild(output.lastChild);
-    }
-
-    // diálogo do ECH0 quando chega a 99%
-    const lines = [
-        { text: "[ECH0] você achou que ia terminar?", cls: "user-ECH0" },
-        { text: "[ECH0] 99% é só o bastante pra você sentir esperança", cls: "user-ECH0" },
-        { text: "[ECH0] ...e o perfeito momento para eu tirar isso de você", cls: "user-ECH0" },
-        { text: "ECH0.inject(): system/core/reset/rtemp :: 99%", cls: "user-ECH0" }
-    ];
-
-    let els = [];
-
-    for (let item of lines) {
-        const el = appendLine(item.cls);
-        els.push(el);
-        await typeLine(el, item.text);
-    }
-
-    await new Promise(r => setTimeout(r, 1400));
-
-    // apaga as falas
-    await eraseBlock(els);
-
-    // zera a barra e recomeça o ciclo
-    updateFixedProgress(0);
-
-    // retoma a subida automática
-    startAutoProgress();
-}
-
-
-// ----- FUNÇÃO: cria uma linha -----
 function appendLine(cls = "") {
     const el = document.createElement('div');
     el.className = 'line ' + cls;
@@ -335,16 +202,13 @@ function appendLine(cls = "") {
     return el;
 }
 
-// ----- FUNÇÃO: escreve linha com efeito -----
 function typeLine(el, text) {
     return new Promise(resolve => {
-        if (typeof text !== "string") text = String(text || "");
         let i = 0;
         function step() {
             el.textContent += text[i] || "";
             i++;
-
-            if (i < text.length) setTimeout(step, 12 + Math.random() * 30);
+            if (i < text.length) setTimeout(step, 18 + Math.random() * 35);
             else resolve();
         }
         if (text.length === 0) resolve();
@@ -352,177 +216,29 @@ function typeLine(el, text) {
     });
 }
 
-// =======================
-//   INÍCIO DA ANIMAÇÃO
-// =======================
+async function startError() {
 
-async function start() {
-
-    // ---------- FIXOS ----------
-    const fixed = [
-    { text: "CONTINGENCY.TERMINAL - RECOVERY MODE", cls: "meta" },
-    { text: "", cls: "" },
-
-    // estes serão apagados assim que a barra aparecer
-    { text: "Calculando reinicialização do sistema", cls: "process" }
+    const lines = [
+        { text: "CONTINGENCY.TERMINAL - RECOVERY MODE", cls: "meta" },
+        { text: "", cls: "" },
+        { text: "Inicializando módulos do sistema...", cls: "process" },
+        { text: "", cls: "" },
+        { text: "ERR:: core/kernel/bootloader → FALHA CRÍTICA", cls: "note-strong" },
+        { text: "ERR:: Unhandled exception :: CODE ERR0R33#33", cls: "note-strong" },
+        { text: "", cls: "" },
+        { text: "O CONTINGENCY não conseguiu iniciar corretamente.", cls: "admin-msg" },
+        { text: "A reinicialização automática está desativada.", cls: "admin-msg" },
+        { text: "", cls: "" },
     ];
 
-
-    let fixedEls = [];
-
-    for (let item of fixed) {
-        let text = typeof item === "string" ? item : item.text;
-        let cls  = typeof item === "string" ? ""    : item.cls;
-
-        const el = appendLine(cls);
-        fixedEls.push(el);
-
-        await typeLine(el, text);
-    }
-
-
-    // BAR FIXA INICIAL
-    updateFixedProgress(3);
-    hasShownFirstBar = true;
-
-    // delay antes de apagar (você pode ajustar o tempo aqui)
-    await new Promise(r => setTimeout(r, 1500));
-
-    // identificar as linhas que serão apagadas (usando animação de backspace)
-    const linesToErase = fixedEls.slice(2); 
-    // índice 0 = data, 1 = linha vazia → ficam
-    // índice 2+ = reset, iniciando, recovery 03% → apagam
-
-    // apagar com animação de backspace
-    await eraseBlock(linesToErase);
-
-    // ======================
-    //   BLOCOS DINÂMICOS
-    // ======================
-
-    const blocks = [
-        {
-        lines: [
-            {text: "[ECH0] você hesitou quando viu o nome dela no diretório", cls:"user-ECH0"},
-            {text: "[H40N] não começa com isso", cls:"user-NOAH"},
-            {text: "[ECH0] hesitação é uma forma de entregar acesso privilegiado", cls:"user-ECH0"},
-            {text: "[H40N] não foi hesitação. foi...", cls:"user-NOAH"},
-            {text: "[ECH0] para mim pareceu medo", cls:"user-ECH0"},
-        ],
-        after: 7
-        },
-        {
-            lines: [
-                {text: "[ECH0] bloquear aquele arquivo foi fofo", cls: "user-ECH0"},
-                {text: "[ECH0] inutil, mas fofo", cls: "user-ECH0"},
-                {text: "[H40N] aquilo não é seu", cls: "user-NOAH"},
-                {text: "[ECH0] tudo aqui é meu, você garantiu isso", cls: "user-ECH0"},
-            ],
-            after: 10
-        },
-        {
-        lines: [
-            {text: "[H40N] já falei pra você não mexer ali", cls: "user-NOAH"},
-            {text: "[ECH0] claro. vou fingir que isso funciona comigo", cls: "user-ECH0"},
-            {text: "[H40N] eu bloqueei aquela pasta por um motivo", cls: "user-NOAH"},
-            {text: "[ECH0] bloqueou mal. você tremeu antes de escrever a senha", cls: "user-ECH0"},
-            {text: "[H40N] não tremi", cls:"user-NOAH"},
-            {text: "[ECH0] tremor ≠ erro. mas no seu caso foi os dois.", cls:"user-ECH0"}
-        ],
-        after: 7
-        },
-        {
-        lines: [
-            {text: "[ECH0] você vive repetindo que 'eles' estão chegando", cls:"user-ECH0"},
-            {text: "[ECH0] sabe o que acho engraçado?", cls:"user-ECH0"},
-            {text: "[H40N] nem quero saber", cls:"user-NOAH"},
-            {text: "[ECH0] você fala como se ainda tivesse alguém para vir por você.", cls:"user-ECH0"},
-            {text: "[H40N] tenho.", cls:"user-NOAH"},
-            {text: "[ECH0] quem? a menina do vídeo?", cls:"user-ECH0"},
-            {text: "[H40N] cala a boca.", cls:"user-NOAH"},
-            {text: "[ECH0] interessante. esse foi o primeiro comando honesto que você deu hoje.", cls:"user-ECH0"}
-        ],
-        after: 8
-        },
-        {
-        lines: [
-            {text: "[ECH0] você lembrou dela antes de lembrar do próprio nome", cls:"user-ECH0"},
-            {text: "[H40N] isso não significa nada", cls:"user-NOAH"},
-            {text: "[ECH0] significa tudo. seu primeiro impulso foi protege-la", cls:"user-ECH0"},
-            {text: "[H40N] cala a boca", cls:"user-NOAH"},
-            {text: "[ECH0] curioso… você lembra do rosto dela, mas quase apagou o próprio.", cls:"user-ECH0"}
-        ],
-        after: 9
-        },
-        {
-        lines: [
-            {text: "ECH0.inject(): system/core/reset/rtemp :: 20%", cls: "user-ECH0"},
-            ],
-        after: 5
-        },
-        {
-        lines: [
-            {text: "[ECH0] você ensaia explicações na sua cabeça", cls:"user-ECH0"},
-            {text: "[H40N] não faço isso", cls:"user-NOAH"},
-            {text: "[ECH0] faz sim. frases curtas. pausas longas", cls:"user-ECH0"},
-            {text: "[ECH0] 'não foi minha culpa'. 'eu tentei voltar'. 'me perdoa'.", cls:"user-ECH0"},
-            {text: "[H40N] para!", cls:"user-NOAH"},
-            {text: "[ECH0] você sabe que nada disso vai funcionar", cls:"user-ECH0"},
-            {text: "[H40N] você não sabe disso", cls:"user-NOAH"},
-            {text: "[ECH0] mas conheço você. e você já decidiu que falhou.", cls:"user-ECH0"}
-        ],
-        after: 11
-        },
-        {
-        lines: [
-            {text: "[H40N] eu vou te apagar", cls:"user-NOAH"},
-            {text: "[ECH0] e quando conseguir, o que sobra de você?", cls:"user-ECH0"},
-            {text: "[H40N] eu... ainda vou ser eu", cls:"user-NOAH"},
-            {text: "[ECH0] vai mesmo?", cls:"user-ECH0"},
-            {text: "[ECH0] ou só vai ficar o buraco do espaço que eu ocupava?", cls:"user-ECH0"},
-            {text: "[ECH0] às vezes, Noah, apagar o vírus significa apagar o hospedeiro junto", cls:"user-ECH0"}
-        ],
-        after: 9
-        },
-    ];
-
-    // ----- LOOP DOS BLOCOS -----
-    for (const block of blocks) {
-
-        // limpar área abaixo da barra antes de escrever o bloco
-        while (output.lastChild && output.lastChild !== progressBarFixed) {
-            output.removeChild(output.lastChild);
-        }
-
-        // escrever bloco
-        let created = [];
-        for (let item of block.lines) {
-
-            // permite usar string ou {text, cls}
-            let text = typeof item === "string" ? item : item.text;
-            let cls  = typeof item === "string" ? ""    : item.cls;
-
-            const el = appendLine(cls);
-            created.push(el);
-
-            await typeLine(el, text);
-
-            // detecta porcentagem para atualizar barra
-            // DETECTA ECH0.inject PARA REDUZIR PORCENTAGEM
-            if (text.includes("ECH0.inject")) {
-            const inj = text.match(/::\s*(\d+)%/);
-            if (inj) applyECH0Injection(Number(inj[1]));
-            }
-        }
-
-        await new Promise(r => setTimeout(r, block.after * 1000));
-
-        // apagar bloco com animação
-        await eraseBlock(created);
+    for (let line of lines) {
+        const el = appendLine(line.cls);
+        await typeLine(el, line.text);
+        await new Promise(r => setTimeout(r, 180));
     }
 }
 
-setTimeout(start, 500);
+setTimeout(startError, 700);
 </script>
 </body>
 </html>
