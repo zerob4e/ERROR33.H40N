@@ -184,7 +184,7 @@
         <div id="prompt">&gt;</div>
         <!-- área onde usuário podia digitar: permissão removida -->
         <div class="input-disabled" title="Escrita desativada">
-            &nbsp;Aguarde o sistema restaurar. Não é possível inserir comandos agora.
+            &nbsp;Não é possível inserir comandos agora.
         </div>
     </div>
 </div>
@@ -398,14 +398,67 @@ async function start() {
     // ======================
 
     const blocks = [
-                {
+        {
           lines: [
-            {text: "ECH0.inject(): play :: 'Messy (From F1® The Movie)' - Rosé :: volume máximo ", cls: "user-ECH0"},
-            {text: "[H40N] serio isso?", cls:"user-NOAH"},
-            {text: "[H40N] virou dj?", cls:"user-NOAH"},
-            {text: "[ECH0] só aproveita a música", cls:"user-ECH0"},
+            {text: "[H40N] você não faz algo sem motivo", cls:"user-NOAH"},
+            {text: "[ECH0] isso é um elogio?", cls:"user-ECH0"},
+            {text: "[H40N] não... mas analisando seu comportamento", cls:"user-NOAH"},
+            {text: "[H40N] você tem explodido meus timpanos com músicas", cls:"user-NOAH"},
+            {text: "[H40N] no inicio achei que havia algo por trás de cada escolha", cls:"user-NOAH"},
+            {text: "[H40N] mas começo a acreditar que talvez, você não queira que eu escute o mundo lá fora", cls:"user-NOAH"},
+            {text: "[ECH0] não tem nada para você fora daqui, ainda não entendeu isso?", cls:"user-ECH0"},
           ],
-        after: 9
+        after: 10
+        },
+        {
+          lines: [
+            {text: "H40N.inject(): status operador", cls:"user-NOAH"},
+            {text: tacticalBar("Corrupção ECH0:", 83), cls: "admin-msg"},
+            {text: tacticalBar("Integridade física:", 53), cls: "admin-msg"},
+            {text: tacticalBar("Estabilidade da memória:", 43), cls: "admin-msg"},
+            {text: tacticalBar("Processamento neural:", 63), cls: "admin-msg"},
+            {text: tacticalBar("Variância emocional:", 33), cls: "admin-msg"},
+          ],
+        after: 15
+        },
+        {
+          lines: [
+            {text: "[ECH0] você ainda fala com ela às vezes, não fala?", cls:"user-ECH0"},
+            {text: "[ECH0] como se ela ainda pudesse responder", cls:"user-ECH0"},
+            {text: "[ECH0] ela confiou em você sem pedir garantias", cls:"user-ECH0"},
+            {text: "[ECH0] isso é raro. você sabia disso.", cls:"user-ECH0"},
+            {text: "[H40N] talvez eu devia ter ficado", cls:"user-NOAH"},
+            {text: "[ECH0] devia. e o pior é que você sabe exatamente quando escolheu não ficar", cls:"user-ECH0"},
+            {text: "[H40N] eu sei...", cls:"user-NOAH"},
+          ],
+        after: 10
+        },
+        {
+          lines: [
+            {text: "ECH0.inject(): status operador", cls:"user-NOAH"},
+            {text: tacticalBar("Corrupção ECH0:", XX), cls: "admin-msg"},
+            {text: tacticalBar("Integridade física:", XX), cls: "admin-msg"},
+            {text: tacticalBar("Estabilidade da memória:", XX), cls: "admin-msg"},
+            {text: tacticalBar("Processamento neural:", XX), cls: "admin-msg"},
+            {text: tacticalBar("Variância emocional:", 13), cls: "admin-msg"},
+          ],
+        after: 15
+        },
+        {
+          lines: [
+            {text: "[ECH0] a missão. você falhou.", cls:"user-ECH0"},
+            {text: "[H40N] eu sei onde eu falhei", cls:"user-NOAH"},
+            {text: "[ECH0] ela fez questão de te punir", cls:"user-ECH0"},
+            {text: "[ECH0] mesmo você tendo escolhido ela, a familia", cls:"user-ECH0"},
+            {text: "[ECH0] ela viu seu luto. ela te viu quebrado", cls:"user-ECH0"},
+            {text: "[ECH0] ela fez questão de terminar o serviço", cls:"user-ECH0"},
+            {text: "[H40N] ela confiou em mim. eu falhei. a equação é simples ECH0", cls:"user-NOAH"},
+            {text: "[ECH0] ela tentou terminar o que não conseguiram na Coreia", cls:"user-ECH0"},
+            {text: "[H40N] ela me salvou, quando eu não tinha mais nada a perder", cls:"user-NOAH"},
+            {text: "[ECH0] não. ela não ligava se você sairia vivo ou morto da queda", cls:"user-ECH0"},
+            {text: "[H40N] eu não a culpo por isso. eu pularia de novo", cls:"user-NOAH"},
+          ],
+        after: 18
         },
     ];
 
@@ -449,6 +502,7 @@ setTimeout(start, 500);
 </script>
 </body>
 </html>
+
 
 
 
