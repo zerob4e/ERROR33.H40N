@@ -230,12 +230,16 @@ function updateFixedProgress(val) {
     }
 }
 
-function tacticalBar(label, value) {
-    const max = 100;
-    const filled = Math.round((value / max) * 20);
-    const empty = 20 - filled;
+function tacticalBar(label, percent) {
+    const total = 12;
 
-    return `${label} [${"█".repeat(filled)}${"░".repeat(empty)}] ${value}%`;
+    // calcula quantos blocos preenchidos
+    const filled = Math.floor((percent / 100) * total);
+    const empty = total - filled;
+
+    const bar = "▦".repeat(filled) + "▢".repeat(empty);
+
+    return `${label}:     [${bar}] ${percent}%`;
 }
 
 
@@ -511,6 +515,7 @@ setTimeout(start, 500);
 </script>
 </body>
 </html>
+
 
 
 
