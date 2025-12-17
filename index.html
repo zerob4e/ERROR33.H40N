@@ -230,6 +230,15 @@ function updateFixedProgress(val) {
     }
 }
 
+function tacticalBar(label, value) {
+    const max = 100;
+    const filled = Math.round((value / max) * 20);
+    const empty = 20 - filled;
+
+    return `${label} [${"█".repeat(filled)}${"░".repeat(empty)}] ${value}%`;
+}
+
+
 // inicia subida automática de 1% a cada 10s
 function startAutoProgress() {
     if (autoProgressInterval) return; 
@@ -436,10 +445,10 @@ async function start() {
         {
           lines: [
             {text: "ECH0.inject(): status operador", cls:"user-NOAH"},
-            {text: tacticalBar("Corrupção ECH0:", XX), cls: "admin-msg"},
-            {text: tacticalBar("Integridade física:", XX), cls: "admin-msg"},
-            {text: tacticalBar("Estabilidade da memória:", XX), cls: "admin-msg"},
-            {text: tacticalBar("Processamento neural:", XX), cls: "admin-msg"},
+            {text: tacticalBar("Corrupção ECH0:", 00), cls: "admin-msg"},
+            {text: tacticalBar("Integridade física:", 00), cls: "admin-msg"},
+            {text: tacticalBar("Estabilidade da memória:", 00), cls: "admin-msg"},
+            {text: tacticalBar("Processamento neural:", 00), cls: "admin-msg"},
             {text: tacticalBar("Variância emocional:", 13), cls: "admin-msg"},
           ],
         after: 15
@@ -502,6 +511,7 @@ setTimeout(start, 500);
 </script>
 </body>
 </html>
+
 
 
 
