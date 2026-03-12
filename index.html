@@ -1,523 +1,339 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>H40N - N.ROOT | TERMINAL V3.3</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOAH RESEARCH TERMINAL</title>
+
 <style>
-    :root{
-        --bg:#0a0a0a;
-        --panel:#111;
-        --panel-2:#1a1a1a;
-        --text:#e5e5e5;
-        --muted:#9aa4ac;
-        --accent:#4ecbff;
-        --prompt:#00e676;
-        --user:#6ac8ff;
-        --admin:#e5e5e5;
-    }
-    html,body{
-        height:100%;
-        margin:0;
-        background:var(--bg);
-        font-family:monospace;
-        color:var(--text);
-    }
-    .terminal-wrapper{
-        width:92%;
-        max-width:980px;
-        margin:28px auto;
-        border-radius:10px;
-        overflow:hidden;
-        border:1px solid #222;
-        box-shadow:0 10px 50px rgba(0,0,0,0.7);
-        background:linear-gradient(180deg,var(--panel),#0f0f0f);
-    }
-    .terminal-header{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        padding:12px;
-        background:var(--panel-2);
-        border-bottom:1px solid #222
-    }
-    .dot{
-        width:12px;
-        height:12px;
-        border-radius:50%
-    }
-    .red{background:#ff5f56}
-    .yellow{background:#ffbd2e}
-    .green{background:#27c93f}
-    
-    .terminal-title{
-        flex:1;
-        text-align:center;
-        opacity:.85;
-        font-size:0.95rem
-    }
-    #output{
-        height:68vh;
-        padding:20px;
-        overflow-y:auto;
-        white-space:pre-wrap;
-        line-height:1.35;
-        font-size:0.98rem
-    }
-    .terminal-input-area{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        padding:12px;
-        background:var(--panel-2);
-        border-top:1px solid #222
-    }
-    #prompt{color:var(--prompt);font-weight:700}
-    /* fake input box (disabled) */
-    .input-disabled{
-        flex:1;
-        padding:10px 12px;
-        border-radius:6px;
-        border:1px dashed #2b2b2b;
-        background:transparent;
-        color:var(--muted);
-        font-family:monospace;
-        font-size:0.95rem;
-    }
-    .note-strong{color:#ff9aa2;font-weight:700}
-    .line{margin:6px 0}
-    .meta{color:var(--muted)}
-    .user-NOAH{color:#3ee9e9}
-    .user-ECH0{color:#ffa200}
-    .admin-msg{color:var(--admin)}
-    .process{color:#ffdb25}
-    .sucess{color:#00e676}
 
-    /* typing caret for lines being typed */
-    .typing-caret::after{
-        content: "|";
-        display:inline-block;
-        margin-left:6px;
-        animation: blink 1s steps(2,start) infinite;
-        color:var(--text);
-    }
-    @keyframes blink{50%{opacity:0}}
-    /* small emphasis */
-    .em{color:var(--accent)}
-    /* scrollbar cosmetic */
-    #output::-webkit-scrollbar{width:10px}
-    #output::-webkit-scrollbar-thumb{background:#111;border-radius:6px}
+body{
+background:#0a0a0a;
+margin:0;
+font-family:monospace;
+color:#e5e5e5;
+}
 
-    .gap {
-    height: 22px;     /* tamanho visual do salto */
-    display: block;
-    }
+/* TERMINAL */
 
-    .progress-bar-container {
-    width: 100%;
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 6px;
-    margin-top: 8px;
-    padding: 6px;
-    }
+.terminal-wrapper{
+width:90%;
+max-width:1200px;
+margin:40px auto;
+border:1px solid #333;
+border-radius:8px;
+overflow:hidden;
+background:#111;
+box-shadow:0 0 20px rgba(0,0,0,.6);
+}
 
-    .progress-label {
-    margin-top: 4px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    }
+.terminal-header{
+background:#1a1a1a;
+padding:10px;
+border-bottom:1px solid #333;
+display:flex;
+align-items:center;
+gap:10px;
+}
 
-    /* animação de "processando" na barra fixa */
-    .progress-bar {
-        height: 14px;
-        width: 0%;
-        background: var(--accent);
-        border-radius: 4px;
-        transition: width 1.6s ease;
-        position: relative;
-        overflow: hidden;
-    }
+.dot{width:12px;height:12px;border-radius:50%;}
+.red{background:#ff5f56;cursor:pointer;}
+.yellow{background:#ffbd2e;}
+.green{background:#27c93f;}
 
-    /* efeito de brilho se movendo dentro da barra */
-    .progress-bar::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -40%;
-        width: 40%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,0.35),
-            transparent
-        );
-        animation: barShine 1.4s infinite linear;
-        mix-blend-mode: screen;
-    }
+.terminal-title{
+flex:1;
+text-align:center;
+opacity:.7;
+}
 
-    @keyframes barShine {
-        0% { left: -40%; }
-        100% { left: 140%; }
-    }
+/* GRID */
 
-    .fade-out {
-    opacity: 0;
-    transition: opacity 0.45s ease;
-    }
+#main-grid{
+display:flex;
+min-height:80vh;
+}
+
+/* SIDEBAR */
+
+#sidebar{
+width:260px;
+border-right:1px solid #333;
+padding:15px;
+background:#111;
+}
+
+.sidebar-title{
+font-size:12px;
+opacity:.6;
+margin-bottom:10px;
+letter-spacing:1px;
+}
+
+.folder{
+padding:8px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:6px;
+background:#161616;
+border:1px solid #222;
+}
+
+.folder:hover{
+background:#222;
+}
+
+/* FILE LIST */
+
+#file-area{
+flex:1;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+overflow:auto;
+}
+
+.file{
+background:#161616;
+border:1px solid #222;
+padding:12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.file:hover{
+background:#222;
+}
+
+/* VIEWER */
+
+#viewerOverlay{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.8);
+z-index:999;
+}
+
+.viewer-window{
+width:90%;
+height:90%;
+margin:30px auto;
+background:#111;
+border:1px solid #333;
+border-radius:8px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+.viewer-header{
+background:#1a1a1a;
+padding:10px;
+display:flex;
+align-items:center;
+gap:10px;
+border-bottom:1px solid #333;
+}
+
+#viewerFrame{
+flex:1;
+border:none;
+background:#111;
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+.terminal-wrapper{
+width:95%;
+margin:20px auto;
+}
+
+#main-grid{
+flex-direction:column;
+}
+
+#sidebar{
+width:100%;
+border-right:none;
+border-bottom:1px solid #333;
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+}
+
+.sidebar-title{
+width:100%;
+}
+
+.folder{
+flex:1;
+text-align:center;
+}
+
+#file-area{
+padding:15px;
+}
+
+.viewer-window{
+width:95%;
+height:85%;
+margin:20px auto;
+}
+
+.file{
+font-size:14px;
+padding:14px;
+}
+
+}
 
 </style>
+
 </head>
+
 <body>
-<div class="terminal-wrapper" role="region" aria-label="Contingency Terminal">
-    <div class="terminal-header">
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
-        <div class="terminal-title">H40N - N.ROOT | TERMINAL V3.3</div>
-    </div>
 
-    <div id="output" aria-live="polite"></div>
+<div class="terminal-wrapper">
 
-    <div class="terminal-input-area" aria-hidden="true">
-        <div id="prompt">&gt;</div>
-        <!-- área onde usuário podia digitar: permissão removida -->
-        <div class="input-disabled" title="Escrita desativada">
-            &nbsp;Não é possível inserir comandos agora.
-        </div>
-    </div>
+<div class="terminal-header">
+<div class="dot red" onclick="closeViewer()"></div>
+<div class="dot yellow"></div>
+<div class="dot green"></div>
+<div class="terminal-title">NOAH RESEARCH TERMINAL — PUBLIC ARCHIVE</div>
+</div>
+
+<div id="main-grid">
+
+<div id="sidebar">
+
+<div class="sidebar-title">ARQUIVOS</div>
+
+<div class="folder" onclick="openFolder('demologia')">📁 Demologia</div>
+<div class="folder" onclick="openFolder('relatorios')">📁 Relatórios</div>
+<div class="folder" onclick="openFolder('registros')">📁 Registros H40N</div>
+
+</div>
+
+<div id="file-area">
+Selecione uma pasta para acessar os arquivos.
+</div>
+
+</div>
+</div>
+
+<!-- VIEWER -->
+
+<div id="viewerOverlay">
+
+<div class="viewer-window">
+
+<div class="viewer-header">
+<div class="dot red" onclick="closeViewer()"></div>
+<div class="dot yellow"></div>
+<div class="dot green"></div>
+<div class="terminal-title">VISUALIZANDO ARQUIVO</div>
+</div>
+
+<iframe id="viewerFrame"></iframe>
+
+</div>
 </div>
 
 <script>
-const output = document.getElementById('output');
 
-let progressBarFixed = null;
-let hasShownFirstBar = false;
+const files = {
 
-// ----- FUNÇÃO: cria barra fixa ou atualiza -----
-// -----------------------------
-// SISTEMA DE PROGRESSO AUTOMÁTICO
-// -----------------------------
-let progressValue = 30;  // valor inicial da barra
-let autoProgressInterval = null;
+demologia: [
+{name:"origem quinn",path:"files/demologia/origem_quinn.jpg"},
+{name:"trajetoria nkt - quinn",path:"files/demologia/trajetoria_nkt-quinn.jpg"},
+{name:"culpa",path:"files/demologia/culpa_lurdes.jpg"},
+{name:"kai",path:"files/demologia/video_kai.jpg"},
+{name:"linhagem",path:"files/demologia/linhagem_asuna.jpg"},
+],
 
-// cria/atualiza a barra fixa
-function updateFixedProgress(val) {
-    progressValue = Math.max(0, Math.min(val, 99)); // nunca chega a 100
+relatorios: [
+{name:"relatorio amanecer",path:"files/relatorios/arq-amanecer_relatorio.html"},
+{name:"relatorio kitsune",path:"files/relatorios/arq-kitsune_relatorio.html"},
+{name:"relatorio h40n",path:"files/relatorios/arq-noah_operador.html"},
+],
 
-    if (!progressBarFixed) {
-        progressBarFixed = document.createElement("div");
-        progressBarFixed.className = "progress-bar-container";
+registros: [
+{name:"blueprint",path:"files/registros/arq-amanecer_experimento.html"},
+{name:"h40n thoughts",path:"files/registros/arq-noah_thoughts.html"}
+]
 
-        const bar = document.createElement("div");
-        bar.className = "progress-bar";
-        bar.style.width = progressValue + "%";
-
-        const label = document.createElement("div");
-        label.className = "progress-label";
-        label.textContent = `Restaurando sistema... ${progressValue}%`;
-
-        progressBarFixed.appendChild(bar);
-        progressBarFixed.appendChild(label);
-        output.appendChild(progressBarFixed);
-    } else {
-        const bar = progressBarFixed.querySelector(".progress-bar");
-        const label = progressBarFixed.querySelector(".progress-label");
-
-        bar.style.width = progressValue + "%";
-        label.textContent = `Restaurando sistema... ${progressValue}%`;
-    }
 }
 
-function tacticalBar(label, percent) {
-    const total = 12;
+function openFolder(folder){
 
-    // calcula quantos blocos preenchidos
-    const filled = Math.floor((percent / 100) * total);
-    const empty = total - filled;
+const area=document.getElementById("file-area")
+area.innerHTML=""
 
-    const bar = "▦".repeat(filled) + "▢".repeat(empty);
+files[folder].forEach(file=>{
 
-    return `${label}:     [${bar}] ${percent}%`;
+const div=document.createElement("div")
+div.className="file"
+div.innerText=file.name
+div.onclick=()=>openFile(file.path)
+
+area.appendChild(div)
+
+})
+
 }
 
+function openFile(path){
 
-// inicia subida automática de 1% a cada 10s
-function startAutoProgress() {
-    if (autoProgressInterval) return; 
+const viewer=document.getElementById("viewerOverlay")
+const frame=document.getElementById("viewerFrame")
 
-    autoProgressInterval = setInterval(() => {
-        if (progressValue < 99) {
-    updateFixedProgress(progressValue + 1);
-    } else {
-    triggerECH0Reset(); // chama a quebra do ECH0
-    }
+if(path.match(/\.(jpg|jpeg|png|gif)$/i)){
 
-    }, 2000);
-}
+frame.srcdoc=`
+<html>
+<body style="
+margin:0;
+background:#111;
+">
 
-// reduz porcentagem quando ECH0.inject aparece
-function applyECH0Injection(amount) {
-    updateFixedProgress(progressValue - amount);
-}
+<img src="${path}" style="
+width:100%;
+height:auto;
+display:block;
+padding:10px;
+box-sizing:border-box;
+">
 
-// chama depois de criar a barra inicial
-startAutoProgress();
-
-
-// ----- FUNÇÃO: remove linhas ENTRE o índice 8 até antes da barra -----
-// (mantive essa função, não usada se você prefere backspace; deixei por segurança)
-function removeInitialLines() {
-    const children = Array.from(output.children);
-
-    // Mantém tudo até a barra fixa
-    const preserveUntil = children.indexOf(progressBarFixed);
-
-    for (let i = preserveUntil - 1; i >= 2; i--) {
-        output.removeChild(children[i]);
-    }
-}
-
-// ----- FUNÇÃO: apaga bloco com animação de backspace -----
-async function eraseBlock(lines) {
-    for (let i = lines.length - 1; i >= 0; i--) {
-        const el = lines[i];
-
-        // aplica fade-out
-        el.classList.add("fade-out");
-
-        // espera a transição terminar
-        await new Promise(resolve => setTimeout(resolve, 460));
-
-        if (el.parentElement) {
-            el.parentElement.removeChild(el);
-        }
-    }
-}
-
-// ============================
-//   FUNÇÃO: RESET DO ECH0
-// ============================
-async function triggerECH0Reset() {
-
-    // impede progressão automática enquanto ECH0 fala
-    clearInterval(autoProgressInterval);
-    autoProgressInterval = null;
-
-    // limpa qualquer bloco que ainda esteja na tela (mantém só a barra)
-    while (output.lastChild && output.lastChild !== progressBarFixed) {
-        output.removeChild(output.lastChild);
-    }
-
-    // diálogo do ECH0 quando chega a 99%
-    const lines = [
-        { text: "[ECH0] isso nunca perde a graça", cls: "user-ECH0" },
-    ];
-
-    let els = [];
-
-    for (let item of lines) {
-        const el = appendLine(item.cls);
-        els.push(el);
-        await typeLine(el, item.text);
-    }
-
-    await new Promise(r => setTimeout(r, 1400));
-
-    // apaga as falas
-    await eraseBlock(els);
-
-    // zera a barra e recomeça o ciclo
-    updateFixedProgress(0);
-
-    // retoma a subida automática
-    startAutoProgress();
-}
-
-
-// ----- FUNÇÃO: cria uma linha -----
-function appendLine(cls = "") {
-    const el = document.createElement('div');
-    el.className = 'line ' + cls;
-    output.appendChild(el);
-    output.scrollTop = output.scrollHeight;
-    return el;
-}
-
-// ----- FUNÇÃO: escreve linha com efeito -----
-function typeLine(el, text) {
-    return new Promise(resolve => {
-        if (typeof text !== "string") text = String(text || "");
-        let i = 0;
-        function step() {
-            el.textContent += text[i] || "";
-            i++;
-
-            if (i < text.length) setTimeout(step, 12 + Math.random() * 30);
-            else resolve();
-        }
-        if (text.length === 0) resolve();
-        else step();
-    });
-}
-
-// =======================
-//   INÍCIO DA ANIMAÇÃO
-// =======================
-
-async function start() {
-
-    // ---------- FIXOS ----------
-    const fixed = [
-    { text: "RECOVERY MODE", cls: "meta" },
-    { text: "", cls: "" },
-
-    // estes serão apagados assim que a barra aparecer
-    { text: "Calculando reinicialização do sistema", cls: "process" }
-    ];
-
-
-    let fixedEls = [];
-
-    for (let item of fixed) {
-        let text = typeof item === "string" ? item : item.text;
-        let cls  = typeof item === "string" ? ""    : item.cls;
-
-        const el = appendLine(cls);
-        fixedEls.push(el);
-
-        await typeLine(el, text);
-    }
-
-
-    // BAR FIXA INICIAL
-    updateFixedProgress(3);
-    hasShownFirstBar = true;
-
-    // delay antes de apagar (você pode ajustar o tempo aqui)
-    await new Promise(r => setTimeout(r, 1500));
-
-    // identificar as linhas que serão apagadas (usando animação de backspace)
-    const linesToErase = fixedEls.slice(2); 
-    // índice 0 = data, 1 = linha vazia → ficam
-    // índice 2+ = reset, iniciando, recovery 03% → apagam
-
-    // apagar com animação de backspace
-    await eraseBlock(linesToErase);
-
-    // ======================
-    //   BLOCOS DINÂMICOS
-    // ======================
-
-    const blocks = [
-        {
-          lines: [
-            {text: "[H40N] você não faz algo sem motivo", cls:"user-NOAH"},
-            {text: "[ECH0] isso é um elogio?", cls:"user-ECH0"},
-            {text: "[H40N] não... mas analisando seu comportamento", cls:"user-NOAH"},
-            {text: "[H40N] você tem explodido meus timpanos com músicas", cls:"user-NOAH"},
-            {text: "[H40N] no inicio achei que havia algo por trás de cada escolha", cls:"user-NOAH"},
-            {text: "[H40N] mas começo a acreditar que talvez, você não queira que eu escute o mundo lá fora", cls:"user-NOAH"},
-            {text: "[ECH0] não tem nada para você fora daqui, ainda não entendeu isso?", cls:"user-ECH0"},
-          ],
-        after: 10
-        },
-        {
-          lines: [
-            {text: "H40N.inject(): status operador", cls:"user-NOAH"},
-            {text: tacticalBar("Corrupção ECH0:", 83), cls: "admin-msg"},
-            {text: tacticalBar("Integridade física:", 53), cls: "admin-msg"},
-            {text: tacticalBar("Estabilidade da memória:", 43), cls: "admin-msg"},
-            {text: tacticalBar("Processamento neural:", 63), cls: "admin-msg"},
-            {text: tacticalBar("Variância emocional:", 33), cls: "admin-msg"},
-          ],
-        after: 15
-        },
-        {
-          lines: [
-            {text: "[ECH0] você ainda fala com ela às vezes, não fala?", cls:"user-ECH0"},
-            {text: "[ECH0] como se ela ainda pudesse responder", cls:"user-ECH0"},
-            {text: "[ECH0] ela confiou em você sem pedir garantias", cls:"user-ECH0"},
-            {text: "[ECH0] isso é raro. você sabia disso.", cls:"user-ECH0"},
-            {text: "[H40N] talvez eu devia ter ficado", cls:"user-NOAH"},
-            {text: "[ECH0] devia. e o pior é que você sabe exatamente quando escolheu não ficar", cls:"user-ECH0"},
-            {text: "[H40N] eu sei...", cls:"user-NOAH"},
-          ],
-        after: 10
-        },
-        {
-          lines: [
-            {text: "ECH0.inject(): status operador", cls:"user-NOAH"},
-            {text: tacticalBar("Corrupção ECH0:", 00), cls: "admin-msg"},
-            {text: tacticalBar("Integridade física:", 00), cls: "admin-msg"},
-            {text: tacticalBar("Estabilidade da memória:", 00), cls: "admin-msg"},
-            {text: tacticalBar("Processamento neural:", 00), cls: "admin-msg"},
-            {text: tacticalBar("Variância emocional:", 13), cls: "admin-msg"},
-          ],
-        after: 15
-        },
-        {
-          lines: [
-            {text: "[ECH0] a missão. você falhou.", cls:"user-ECH0"},
-            {text: "[H40N] eu sei onde eu falhei", cls:"user-NOAH"},
-            {text: "[ECH0] ela fez questão de te punir", cls:"user-ECH0"},
-            {text: "[ECH0] mesmo você tendo escolhido ela, a familia", cls:"user-ECH0"},
-            {text: "[ECH0] ela viu seu luto. ela te viu quebrado", cls:"user-ECH0"},
-            {text: "[ECH0] ela fez questão de terminar o serviço", cls:"user-ECH0"},
-            {text: "[H40N] ela confiou em mim. eu falhei. a equação é simples ECH0", cls:"user-NOAH"},
-            {text: "[ECH0] ela tentou terminar o que não conseguiram na Coreia", cls:"user-ECH0"},
-            {text: "[H40N] ela me salvou, quando eu não tinha mais nada a perder", cls:"user-NOAH"},
-            {text: "[ECH0] não. ela não ligava se você sairia vivo ou morto da queda", cls:"user-ECH0"},
-            {text: "[H40N] eu não a culpo por isso. eu pularia de novo", cls:"user-NOAH"},
-          ],
-        after: 18
-        },
-    ];
-
-    // ----- LOOP DOS BLOCOS -----
-    for (const block of blocks) {
-
-        // limpar área abaixo da barra antes de escrever o bloco
-        while (output.lastChild && output.lastChild !== progressBarFixed) {
-            output.removeChild(output.lastChild);
-        }
-
-        // escrever bloco
-        let created = [];
-        for (let item of block.lines) {
-
-            // permite usar string ou {text, cls}
-            let text = typeof item === "string" ? item : item.text;
-            let cls  = typeof item === "string" ? ""    : item.cls;
-
-            const el = appendLine(cls);
-            created.push(el);
-
-            await typeLine(el, text);
-
-            // detecta porcentagem para atualizar barra
-            // DETECTA ECH0.inject PARA REDUZIR PORCENTAGEM
-            if (text.includes("ECH0.inject")) {
-            const inj = text.match(/::\s*(\d+)%/);
-            if (inj) applyECH0Injection(Number(inj[1]));
-            }
-        }
-
-        await new Promise(r => setTimeout(r, block.after * 1000));
-
-        // apagar bloco com animação
-        await eraseBlock(created);
-    }
-}
-
-setTimeout(start, 500);
-</script>
 </body>
 </html>
+`
 
+}else{
 
+frame.src=path
 
+}
 
+viewer.style.display="block"
 
+}
 
+function closeViewer(){
+
+document.getElementById("viewerOverlay").style.display="none"
+document.getElementById("viewerFrame").src=""
+
+}
+
+</script>
+
+</body>
+</html>
